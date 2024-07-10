@@ -1,4 +1,4 @@
-module.exports =  class Calendar{
+class Calendar{
   constructor(calendar_id){
     this.calendar_id = calendar_id;
     this.calendar_app = CalendarApp.getCalendarById(this.calendar_id);

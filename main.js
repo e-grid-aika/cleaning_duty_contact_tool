@@ -38,11 +38,11 @@ function createCleaningSchedule(){
   }
 }
 /**
- * notificationCleaning
+ * cleaningDutyBot
  * Chatworkを使って掃除当番を通知する処理
  * 
  */
-function notificationCleaning(){
+function cleaningDutyBot(){
   const calendar_id = PropertiesService.getScriptProperties().getProperty("Calendar_id");
   const calendar_obj = new Calendar(calendar_id);
   const events = calendar_obj.getTodayEvents();
@@ -57,13 +57,17 @@ function notificationCleaning(){
     }
   }
 
-  let message =  `[info][title]掃除当番の連絡です[/title]今週の掃除当番は\
-  ${user_list[0]}さん・${user_list[1]}さんです。\n定時後にオフィスの清掃をお願いします。[/info]`;
+  if(user_list?.[0]){
+    let message =  `[info][title]掃除当番の連絡です[/title]今週の掃除当番は\
+    ${user_list[0]}さん・${user_list[1]}さんです。\n定時後にオフィスの清掃をお願いします。[/info]`;
   
-  const token = PropertiesService.getScriptProperties().getProperty("Chatwork_API_Token");
-  const room_id = PropertiesService.getScriptProperties().getProperty("Chatwork_room_id");
-  chatwork = new Chatwork(token,room_id);
-  chatwork.sendMessage(message);
+    const token = PropertiesService.getScriptProperties().getProperty("Chatwork_API_Token");
+    const room_id = PropertiesService.getScriptProperties().getProperty("Chatwork_room_id");
+    chatwork = new Chatwork(token,room_id);
+    chatwork.sendMessage(message);
+  }else{
+    console.log('カレンダーイベントの読み込みに失敗しました。');
+  }
 }
 
 function regException(received_text){

@@ -52,4 +52,3 @@ class Member{
     return array_pair;
   }
 }
-module.exports = Member;
