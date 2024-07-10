@@ -1,18 +1,26 @@
 class Member{
-  constructor(array_member){
-    this.array_member = array_member;
+  constructor(){
+    //スプレッドシートからオフィスメンバーの名前を取得
+    const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
+    let ss = SpreadsheetApp.openById(sheet_id);
+    var sheet = ss.getSheetByName("読込シート");
+    const lastRow = sheet.getRange(sheet.getMaxRows(), 1).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+    const array = sheet.getRange(4,1,lastRow-3).getValues();
+    
+    this.array_member = array.flat();
   }
 
   getShuffleMember(){
     //ランダムに並び替えたメンバーの配列を返す処理
-    for(let i=this.array_member.length-1; 0<=i; i--){
+    var shuffle_list = Object.assign([], this.array_member);
+    for(let i=shuffle_list.length-1; 0<=i; i--){
       let r = Math.floor(Math.random()*i+1);
       var tmp;
-      tmp = this.array_member[i];
-      this.array_member[i] = this.array_member[r];
-      this.array_member[r] = tmp;
+      tmp = shuffle_list[i];
+      shuffle_list[i] = shuffle_list[r];
+      shuffle_list[r] = tmp;
     }
-    return this.array_member;
+    return shuffle_list;
   }
 
   createPair(){
@@ -25,7 +33,6 @@ class Member{
     let tmp;
     let tmp_array =[];
     let tmp_member;
-    let tmp_pair = [];
     for(let i=0; i < loop_counts; i++){
       array_pair.push(shuffle_members.slice(i*num,i*num+num));
     }
@@ -44,7 +51,7 @@ class Member{
       //tmp_arrayの中からtmpとペアを組む要素を取り出す
       tmp_member = tmp_array[Math.floor(Math.random()*tmp_array.length)];
       tmp.push(tmp_member);
-      
+    
 
       //その要素とtmpでペアを作り、array_pairに追加
       array_pair.push(tmp);

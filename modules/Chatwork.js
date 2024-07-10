@@ -1,4 +1,3 @@
-// ここから新規に作成しているコード
 class Chatwork{
   constructor(token, room_id){
     
