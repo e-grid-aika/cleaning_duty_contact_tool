@@ -1,4 +1,3 @@
-
 /**
  * createCleaningSchedule
  * 毎月の掃除予定をカレンダーに作成する関数
@@ -20,7 +19,13 @@ function createCleaningSchedule(){
   cleaning_end_dates.forEach((element) => element.setHours(18,30,00));
 
   //スプレッドシートから米子オフィスメンバーの名前を取得
-  const member_list = new Member();
+  const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
+  let ss = SpreadsheetApp.openById(sheet_id);
+  var sheet = ss.getSheetByName("読込シート");
+  const lastRow = sheet.getRange(sheet.getMaxRows(), 1).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+  const array = sheet.getRange(4,1,lastRow-3).getValues();
+  const member_list = new Member(array);
+  
   var title = [];
   
   //メンバーを２人１組のペアにする処理

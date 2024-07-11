@@ -1,12 +1,5 @@
 class Member{
-  constructor(){
-    //スプレッドシートからオフィスメンバーの名前を取得
-    const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
-    let ss = SpreadsheetApp.openById(sheet_id);
-    var sheet = ss.getSheetByName("読込シート");
-    const lastRow = sheet.getRange(sheet.getMaxRows(), 1).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
-    const array = sheet.getRange(4,1,lastRow-3).getValues();
-    
+  constructor(array){
     this.array_member = array.flat();
   }
 
