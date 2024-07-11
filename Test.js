@@ -2,9 +2,8 @@
  * 掃除スケジュールの自動作成テスト
  * 金曜日の18:00~18:30に掃除の予定を一ヶ月分作成できることを確認
  */
-function TestCreateSchedule(){
+function TestCreateCleaningSchedule(){
   const calendar_id = PropertiesService.getScriptProperties().getProperty("TestCalendar_id");
-  const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
   
   //開始と終了用二つのカレンダーオブジェクトを作成する必要がある
   const start_date = new Calendar(calendar_id);
@@ -15,7 +14,12 @@ function TestCreateSchedule(){
   var cleaning_end_dates = end_date.getWeekDay('Friday');
 
   //スプレッドシートから米子オフィスメンバーの名前を取得
-  const member_list = new Member();
+  const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
+  let ss = SpreadsheetApp.openById(sheet_id);
+  var sheet = ss.getSheetByName("読込シート");
+  const lastRow = sheet.getRange(sheet.getMaxRows(), 1).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+  const array = sheet.getRange(4,1,lastRow-3).getValues();
+  const member_list = new Member(array);
   
   var title = [];
   
@@ -35,7 +39,7 @@ function TestCreateSchedule(){
  * Chatworkbot_テスト
  * 
  * ChatworkAPIを使って、テスト用のルームにメッセージを送れるか確認
- * カレンダーにダミーの予定追加　予定のタイトルを「【人名１・人名２】～～～～」とする
+ * カレンダーにダミーの予定追加してから実行する　予定のタイトルを「【人名１・人名２】～～～～」とする
  */
 function TestCleaningDutyBot(){
   const calendar_id = PropertiesService.getScriptProperties().getProperty("TestCalendar_id");
@@ -98,12 +102,25 @@ function TestCalendar(){
  * reatePair()：member_listから2人1組のペアを作成する
  * */
 function TestMember(){
-  const member_list = new Member();
-  shuffle_list = member_list.getShuffleMember();
+  //スプレッドシートからオフィスメンバーの名前を取得
+  const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
+  let ss = SpreadsheetApp.openById(sheet_id);
+  var sheet = ss.getSheetByName("読込シート");
+  const lastRow = sheet.getRange(sheet.getMaxRows(), 1).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+  const array = sheet.getRange(4,1,lastRow-3).getValues();  
+  const member_list = new Member(array);
+  
+  shuffle_list1 = member_list.getShuffleMember();
+  shuffle_list2 = member_list.getShuffleMember();
+  shuffle_list3 = member_list.getShuffleMember();
+  shuffle_list4 = member_list.getShuffleMember();
   pair_list = member_list.createPair();
 
   console.log(member_list);
-  console.log(shuffle_list);
+  console.log(shuffle_list1);
+  console.log(shuffle_list2);
+  console.log(shuffle_list3);
+  console.log(shuffle_list4);
   console.log(pair_list);
 }
 
