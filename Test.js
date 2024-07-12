@@ -13,6 +13,12 @@ function TestCreateCleaningSchedule(){
   var cleaning_start_dates = start_date.getWeekDay('Friday');
   var cleaning_end_dates = end_date.getWeekDay('Friday');
 
+  //掃除の開始・終了時間(時間と分)をスクリプトプロパティから取得
+  const CleaningStartHour = PropertiesService.getScriptProperties().getProperty("CleaningStartHour");
+  const CleaningStartMinute = PropertiesService.getScriptProperties().getProperty("CleaningStartMinute");
+  const CleaningEndHour = PropertiesService.getScriptProperties().getProperty("CleaningEndHour");
+  const CleaningEndMinute = PropertiesService.getScriptProperties().getProperty("CleaningEndMinute");
+
   //スプレッドシートから米子オフィスメンバーの名前を取得
   const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
   let ss = SpreadsheetApp.openById(sheet_id);
@@ -22,9 +28,9 @@ function TestCreateCleaningSchedule(){
   const member_list = new Member(array);
   
   var title = [];
-  
-  cleaning_start_dates.forEach((element) => element.setHours(18,00,00));
-  cleaning_end_dates.forEach((element) => element.setHours(18,30,00));
+
+  cleaning_start_dates.forEach((element) => element.setHours(CleaningStartHour,CleaningStartMinute));
+  cleaning_end_dates.forEach((element) => element.setHours(CleaningEndHour,CleaningEndMinute));
 
   //メンバーを２人１組のペアにする処理
   pair_list = member_list.createPair();
@@ -42,7 +48,7 @@ function TestCreateCleaningSchedule(){
  * カレンダーにダミーの予定追加してから実行する　予定のタイトルを「【人名１・人名２】～～～～」とする
  */
 function TestCleaningDutyBot(){
-  const calendar_id = PropertiesService.getScriptProperties().getProperty("TestCalendar_id");
+  const calendar_id = PropertiesService.getScriptProperties().getProperty("Calendar_id");
   const calendar_obj = new Calendar(calendar_id);
   
   var date = new Date();
