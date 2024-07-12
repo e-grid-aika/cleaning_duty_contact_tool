@@ -1,3 +1,4 @@
+require('dotenv').config()
 class Member{
   constructor(array){
     this.array_member = array.flat();
@@ -16,39 +17,54 @@ class Member{
     return shuffle_list;
   }
 
-  createPair(){
-    //掃除当番のペアを作成
+  /**
+   * 掃除当番のグループを作成
+   * 1グループの人数はスクリプトプロパティGROUP_COUNTの値で設定
+   */
+  createGroup(){
     var shuffle_members;
-    const num = 2;
+    //GASで使用する場合はこちらはコメントアウト
+    const num = Number(process.env.GROUP_COUNT);
+    
+    //GASで動かす場合のGROUP_COUNTの呼び出し
+    // const num = PropertiesService.getScriptProperties().getProperty("GROUP_COUNT");
     var shuffle_members = this.getShuffleMember();
     const loop_counts = Math.ceil(shuffle_members.length/num);
-    let array_pair = [];
-    let tmp;
+    let array_group = [];
+    let tmp = [];
     let tmp_array =[];
     let tmp_member;
-    for(let i=0; i < loop_counts; i++){
-      array_pair.push(shuffle_members.slice(i*num,i*num+num));
-    }
-    //ペアの数が奇数の場合の処理
-    if(shuffle_members.length % 2 == 1){
-      //array_pairの最後の要素を取得
-      //tmpに保存
-      tmp = array_pair[array_pair.length-1];
-      
-      //配列の最後の要素を取り除く
-      array_pair.pop();
-      
-      //array_pairを1次元配列にしたtmp_arrayを作成
-      tmp_array = array_pair.flat();
-
-      //tmp_arrayの中からtmpとペアを組む要素を取り出す
-      tmp_member = tmp_array[Math.floor(Math.random()*tmp_array.length)];
-      tmp.push(tmp_member);
+    if(shuffle_members.length >= num){
+      for(let i=0; i < loop_counts; i++){
+        array_group.push(shuffle_members.slice(i*num,i*num+num));
+      }
     
+      //メンバーの数がnumで割り切れない場合
+      if(shuffle_members.length % num != 0){
+      //array_groupの最後の要素を取得
+      //tmpに保存
+      tmp = array_group[array_group.length-1];
+      
+      //array_groupから最後の要素を取り除く
+      array_group.pop();
+      
+      //array_groupを1次元配列にしたtmp_arrayを作成
+      tmp_array = array_group.flat();
 
-      //その要素とtmpでペアを作り、array_pairに追加
-      array_pair.push(tmp);
+        //tmp_arrayの中から足りないメンバーを追加
+        while(tmp.length != num){
+          tmp_member = tmp_array[Math.floor(Math.random()*tmp_array.length)];
+          if(!tmp.includes(tmp_member)){
+            tmp.push(tmp_member);
+          }
+        }
+      //その要素とtmpでグループを作り、array_groupに追加
+        array_group.push(tmp);
+      }
+      return array_group;
+    }else{
+      console.error('スクリプトプロパティGROUP_COUNTの値がオフィスメンバーの人数より多いです')
     }
-    return array_pair;
   }
 }
+module.exports = Member //GASで動かす場合はコメントアウトする
