@@ -11,13 +11,16 @@ function createCleaningSchedule(){
   const start_date = new Calendar(calendar_id);
   const end_date = new Calendar(calendar_id);
   
-  //1カ月の内,金曜日の日付取得し、掃除開始時間と終了時間を追加する
+  //1カ月の内,金曜日の日付を取得する
   var cleaning_start_dates = start_date.getWeekDay('Friday');
   var cleaning_end_dates = end_date.getWeekDay('Friday');
 
-  cleaning_start_dates.forEach((element) => element.setHours(18,00,00));
-  cleaning_end_dates.forEach((element) => element.setHours(18,30,00));
-
+  //掃除の開始・終了時間(時間と分)をスクリプトプロパティから取得
+  const CleaningStartHour = PropertiesService.getScriptProperties().getProperty("CleaningStartHour");
+  const CleaningStartMinute = PropertiesService.getScriptProperties().getProperty("CleaningStartMinute");
+  const CleaningEndHour = PropertiesService.getScriptProperties().getProperty("CleaningEndHour");
+  const CleaningEndMinute = PropertiesService.getScriptProperties().getProperty("CleaningEndMinute");
+ 
   //スプレッドシートから米子オフィスメンバーの名前を取得
   const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
   let ss = SpreadsheetApp.openById(sheet_id);
@@ -27,7 +30,10 @@ function createCleaningSchedule(){
   const member_list = new Member(array);
   
   var title = [];
-  
+
+  cleaning_start_dates.forEach((element) => element.setHours(CleaningStartHour,CleaningStartMinute));
+  cleaning_end_dates.forEach((element) => element.setHours(CleaningEndHour,CleaningEndMinute));
+
   //メンバーを２人１組のペアにする処理
   pair_list = member_list.createPair();
 
