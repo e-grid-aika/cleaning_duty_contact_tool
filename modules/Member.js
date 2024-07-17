@@ -1,4 +1,4 @@
-require('dotenv').config()
+// require('dotenv').config()
 class Member{
   constructor(array){
     this.array_member = array.flat();
@@ -23,11 +23,11 @@ class Member{
    */
   createGroup(){
     var shuffle_members;
-    //GASで使用する場合はこちらはコメントアウト
-    const num = Number(process.env.GROUP_COUNT);
+
+    // const num = Number(process.env.GROUP_COUNT);//GASで使用する場合はコメントアウトする
     
     //GASで動かす場合のGROUP_COUNTの呼び出し
-    // const num = PropertiesService.getScriptProperties().getProperty("GROUP_COUNT");
+    const num = Number(PropertiesService.getScriptProperties().getProperty("GROUP_COUNT"));
     var shuffle_members = this.getShuffleMember();
     const loop_counts = Math.ceil(shuffle_members.length/num);
     let array_group = [];
@@ -67,4 +67,4 @@ class Member{
     }
   }
 }
-module.exports = Member //GASで動かす場合はコメントアウトする
+// module.exports = Member //GASで動かす場合はコメントアウトする
