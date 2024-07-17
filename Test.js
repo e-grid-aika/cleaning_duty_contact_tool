@@ -3,7 +3,7 @@
  * 金曜日の18:00~18:30に掃除の予定を一ヶ月分作成できることを確認
  */
 function TestCreateCleaningSchedule(){
-  const calendar_id = PropertiesService.getScriptProperties().getProperty("TestCalendar_id");
+  const calendar_id = PropertiesService.getUserProperties().getProperty("TestCalendar_id");
   
   //開始と終了用二つのカレンダーオブジェクトを作成する必要がある
   const start_date = new Calendar(calendar_id);
@@ -20,7 +20,7 @@ function TestCreateCleaningSchedule(){
   const CleaningEndMinute = PropertiesService.getScriptProperties().getProperty("CleaningEndMinute");
 
   //スプレッドシートから米子オフィスメンバーの名前を取得
-  const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
+  const sheet_id = PropertiesService.getUserProperties().getProperty("Sheet_id");
   let ss = SpreadsheetApp.openById(sheet_id);
   var sheet = ss.getSheetByName("読込シート");
   const lastRow = sheet.getRange(sheet.getMaxRows(), 1).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
@@ -28,16 +28,32 @@ function TestCreateCleaningSchedule(){
   const member_list = new Member(array);
   
   var title = [];
-
+  var group_cnt=0;
+  
   cleaning_start_dates.forEach((element) => element.setHours(CleaningStartHour,CleaningStartMinute));
   cleaning_end_dates.forEach((element) => element.setHours(CleaningEndHour,CleaningEndMinute));
 
-  //メンバーを２人１組のペアにする処理
-  pair_list = member_list.createPair();
+  //掃除当番のグループを作成
+  group_list = member_list.createGroup();
 
-  //カレンダーに掃除の予定を追加 
+  //グループの数が掃除予定日より少ない場合、足りないグループを補填
+  while(group_list.length < cleaning_start_dates.length){
+    group_list.push(group_list[group_cnt]);
+    group_cnt++;
+  }
+
+  //カレンダーに掃除の予定日を追加
   for(let i=0; i<cleaning_start_dates.length; i++){
-    title[i] = `【${pair_list[i][0]}・${pair_list[i][1]}】掃除`;
+    var tmp = '';
+    for(let s=0; s<group_list[i].length; s++){
+      if(s == 0){
+        tmp += `${group_list[i][s]}`;
+      }else{
+        tmp += `・${group_list[i][s]}`;
+      }
+    }
+    
+    title[i] = `【${tmp}】掃除`;
     start_date.calendar_app.createEvent(title[i],cleaning_start_dates[i],cleaning_end_dates[i]);
   }
 }
@@ -48,16 +64,17 @@ function TestCreateCleaningSchedule(){
  * カレンダーにダミーの予定追加してから実行する　予定のタイトルを「【人名１・人名２】～～～～」とする
  */
 function TestCleaningDutyBot(){
-  const calendar_id = PropertiesService.getScriptProperties().getProperty("Calendar_id");
+  const calendar_id = PropertiesService.getUserProperties().getProperty("TestCalendar_id");
   const calendar_obj = new Calendar(calendar_id);
   
   var date = new Date();
   const events = calendar_obj.calendar_app.getEventsForDay(date);
   
-  const token = PropertiesService.getScriptProperties().getProperty("TestChatwork_API_Token");
-  const room_id = PropertiesService.getScriptProperties().getProperty("TestChatwork_room_id");
+  const token = PropertiesService.getUserProperties().getProperty("TestChatwork_API_Token");
+  const room_id = PropertiesService.getUserProperties().getProperty("TestChatwork_room_id");
   
   var user_list = [];
+  var title;
   
   chatwork = new Chatwork(token,room_id);
   
@@ -68,15 +85,30 @@ function TestCleaningDutyBot(){
     //正規表現でイベントのタイトルに「】掃除」を含むか判定
     if(myRe.exec(event.getTitle())){
       tmp = event.getTitle().split(/[【・】]/);
-      user_list.push(tmp[1]);
-      user_list.push(tmp[2]);
+      console.log(tmp.length);
+      console.log(tmp);
+      //tmpのlength回数分だけuser_listにpushする
+      for(var s = 1; s < tmp.length-1; s++){
+        user_list.push(tmp[s]);
+      }
     }
   }
 
   //Chatwork APIでメッセージを送信
   if(user_list?.[0]){
+    var tmp = '';
+    for(let i=0; i<user_list.length;i++){
+      if(i == 0){
+        tmp += `${user_list[i]}さん`;
+      }else{
+        tmp += `・${user_list[i]}さん`;
+      }
+    }
+
+    title = tmp;
+    
     let message =  `[info][title]掃除当番の連絡です[/title]今週の掃除当番は\
-    ${user_list[0]}さん・${user_list[1]}さんです。\n定時後にオフィスの清掃をお願いします。[/info]`;
+    ${title}です。\n定時後にオフィスの清掃をお願いします。[/info]`;
     chatwork.sendMessage(message);
   }else{
     console.log('カレンダーイベントの読み込みに失敗しました。');
@@ -88,7 +120,7 @@ function TestCleaningDutyBot(){
  * getWeekDay():曜日ごとの日付を取得する
  * */
 function TestCalendar(){
-  const calendar_id = PropertiesService.getScriptProperties().getProperty("TestCalendar_id");
+  const calendar_id = PropertiesService.getUserProperties().getProperty("TestCalendar_id");
   const test_calendar = new Calendar(calendar_id);
 
   console.log(test_calendar.getWeekDay('Sunday')); //日曜日の日付
@@ -105,39 +137,30 @@ function TestCalendar(){
 /**
  * Memberクラス_テスト
  * getShuffleMember():member_listの中身をランダムに並び替える
- * reatePair()：member_listから2人1組のペアを作成する
+ * reatePair()：member_listからグループを作成する
  * */
 function TestMember(){
   //スプレッドシートからオフィスメンバーの名前を取得
-  const sheet_id = PropertiesService.getScriptProperties().getProperty("Sheet_id");
+  const sheet_id = PropertiesService.getUserProperties().getProperty("Sheet_id");
   let ss = SpreadsheetApp.openById(sheet_id);
   var sheet = ss.getSheetByName("読込シート");
   const lastRow = sheet.getRange(sheet.getMaxRows(), 1).getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
   const array = sheet.getRange(4,1,lastRow-3).getValues();  
   const member_list = new Member(array);
   
-  shuffle_list1 = member_list.getShuffleMember();
-  shuffle_list2 = member_list.getShuffleMember();
-  shuffle_list3 = member_list.getShuffleMember();
-  shuffle_list4 = member_list.getShuffleMember();
-  pair_list = member_list.createPair();
+  group_list = member_list.createGroup();
 
-  console.log(member_list);
-  console.log(shuffle_list1);
-  console.log(shuffle_list2);
-  console.log(shuffle_list3);
-  console.log(shuffle_list4);
-  console.log(pair_list);
+  console.log(member_list); //オフィスメンバーの名前を表示
+  console.log(group_list); //オフィスメンバーを2人1組で表示
+}
+
+function SetProperties(){
+  console.log(PropertiesService.getUserProperties().getProperty("TestCalendar_id"));//テスト用カレンダーのID
+  console.log(PropertiesService.getUserProperties().getProperty("Sheet_id"));//シート用のID
+  console.log(PropertiesService.getUserProperties().getProperty("Calendar_id"));//本番用カレンダーのID
+  console.log(PropertiesService.getUserProperties().getProperty("TestChatwork_API_Token"));
+  console.log(PropertiesService.getUserProperties().getProperty("TestChatwork_room_id"));
+  
 }
 
 
-function test(){
-  const myRe = /】掃除$/;
-  const myArray = myRe.exec("【A・B掃除"); 
-
-  if(myArray){
-    console.log('あったよ');
-  }else{
-    console.log('ないよ');
-  }
-}
