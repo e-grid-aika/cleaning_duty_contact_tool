@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@types/google-apps-script": "^1.0.83",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "typescript": "^5.5.3"
   },
   "scripts": {
     "clean": "rimraf build dist",
