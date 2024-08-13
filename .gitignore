@@ -4,3 +4,4 @@ coverage/**
 .clasp.json
 appsscript.json
 .env
+dist/*.js

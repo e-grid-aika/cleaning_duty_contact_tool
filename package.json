@@ -1,17 +1,26 @@
 {
   "dependencies": {
-    "@types/google-apps-script": "^1.0.83",
-    "dotenv": "^16.4.5",
-    "typescript": "^5.5.3"
+    "dotenv": "^16.4.5"
   },
   "scripts": {
     "clean": "rimraf build dist",
     "lint": "npm run license && eslint --fix --no-error-on-unmatched-pattern src/ test/",
     "bundle": "rollup --no-treeshake -c rollup.config.mjs",
-    "build": "npm run clean && npm run bundle && ncp appsscript.json dist/appsscript.json",
+    "build": "node esbuild.js",
+    "push": "clasp push",
+    "open": "clasp open",
+    "deploy": "npm run build && npm run push",
     "license": "license-check-and-add add -f license-config.json",
     "test": "jest test/ --passWithNoTests --detectOpenHandles",
-    "deploy": "npm run lint && npm run test && npm run build && ncp .clasp-dev.json .clasp.json && clasp push -f",
     "deploy:prod": "npm run lint && npm run test && npm run build && ncp .clasp-prod.json .clasp.json && clasp push"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@google/clasp": "^2.4.2",
+    "@types/google-apps-script": "^1.0.83",
+    "clasp": "^1.0.0",
+    "esbuild": "^0.23.0",
+    "esbuild-gas-plugin": "^0.8.0",
+    "typescript": "^5.5.4"
   }
 }
