@@ -45,3 +45,7 @@ npm install -D esbuild esbuild-gas-plugin
 1. ```npm install -g yarn```
 2. ```yarn add -D jest ts-jest @types/jest```
 https://typescriptbook.jp/tutorials/jest
+
+
+# スクリプトの実行
+```npm run ○○○```でpackge.jsonのscriptsに登録してあるスクリプトを実行する
