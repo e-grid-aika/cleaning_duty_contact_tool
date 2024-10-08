@@ -1,9 +1,6 @@
 
-export class Member{
-
-  arrayMember: string[];
-
-  constructor(array: string[]){
+class Member{
+  constructor(array){
     this.arrayMember = array.flat();
   }
 
@@ -32,6 +29,7 @@ export class Member{
    */
   createGroup(dayOffMembers=[],cleaningDates=[]){
     
+    var shuffleMembers;
     //GASで動かす場合のGROUP_COUNTの呼び出し
     const num = Number(PropertiesService.getScriptProperties().getProperty("GROUP_COUNT"));
     var shuffleMembers = this.getShuffleMember();
@@ -40,15 +38,15 @@ export class Member{
     let tmp = [];
     let tmpArray =[];
     let tmpMember;
-    let tmpMembers: string[] = [];
-    let cleanedMembers: string[] = [];
+    let tmpMembers = [];
+    let cleanedMembers = [];
 
     if(dayOffMembers.length && cleaningDates.length){
         //シャッフルした配列を複製
         tmpMembers = shuffleMembers.concat();
         //日にちごとに予定を作成
         cleaningDates.forEach((cleaningDate) => {
-            let tmpOffMembers: string[] = [];
+            let tmpOffMembers = [];
 
             //cleaningDateの日付に休暇予定のあるメンバーを配列tmpOffMembersに退避
             //tmpMembersから休暇予定のあるメンバーを取り除く

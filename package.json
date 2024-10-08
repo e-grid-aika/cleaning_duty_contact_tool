@@ -6,7 +6,7 @@
     "clean": "rimraf build dist",
     "lint": "npm run license && eslint --fix --no-error-on-unmatched-pattern src/ test/",
     "bundle": "rollup --no-treeshake -c rollup.config.mjs",
-    "build": "node esbuild.js",
+    "build": "node esbuild.js --charset=utf8",
     "push": "clasp push",
     "open": "clasp open",
     "deploy": "npm run build && npm run push",

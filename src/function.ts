@@ -1,3 +1,22 @@
+import { Chatwork } from "./modules/chatwork";
+
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('index');
+}
+
+/**
+ * reCreateCleaningSchedule
+ * 掃除予定を再登録する関数
+ */
+function reCreateCleaningSchedule(action: string){
+  if(action === 'confirm'){
+    createCleaningSchedule();
+    return '掃除予定が更新されました。'
+  }else{
+    return '処理がキャンセルされました。'
+  }
+}
+
 /**
  * createCleaningSchedule
  * 毎月の掃除予定をカレンダーに作成する関数
@@ -5,15 +24,15 @@
  */
 function createCleaningSchedule(){
   //スクリプトプロパティに設定しているカレンダーID,スプレッドシートIDを取得
-  const calendarId = PropertiesService.getScriptProperties().getProperty("Calendar_id");
+  const calendarId: number = PropertiesService.getScriptProperties().getProperty("Calendar_id");
   
   //開始と終了用二つのカレンダーオブジェクトを作成
-  const startDate = new Calendar(calendarId);
-  const endDate = new Calendar(calendarId);
+  const startDate: Object = new Calendar(calendarId);
+  const endDate: Object = new Calendar(calendarId);
   
   //1カ月の内,金曜日の日付を取得する
-  var cleaningStartDates = startDate.getWeekDay('Friday');
-  var cleaningEndDates = endDate.getWeekDay('Friday');
+  let cleaningStartDates = startDate.getWeekDay('Friday');
+  let cleaningEndDates = endDate.getWeekDay('Friday');
 
   //掃除の開始・終了時間(時間と分)をスクリプトプロパティから取得
   const cleaningStartHour = PropertiesService.getScriptProperties().getProperty("CleaningStartHour");
@@ -35,6 +54,15 @@ function createCleaningSchedule(){
     cleaningStartDates.forEach((element) => element.setHours(cleaningStartHour,cleaningStartMinute));
     cleaningEndDates.forEach((element) => element.setHours(cleaningEndHour,cleaningEndMinute));
 
+    
+    const combinedDatesArray = cleaningStartDates.map((item, index) => [item, cleaningEndDates[index]]);
+    // console.log(combinedArray);
+    // console.log(combinedArray.length);
+    
+    for(let i=0;i<combinedDatesArray.length;i++){
+      existCleaningSchedule(calendarId,combinedDatesArray[i][0],combinedDatesArray[i][1]);
+    }
+    
     //掃除当番のグループを作成
     groupList = memberList.createGroup();
 
@@ -65,6 +93,25 @@ function createCleaningSchedule(){
   
 }
 /**
+ * existCleaningSchedule
+ * 掃除予定日に既に掃除の予定が入っている場合、削除する関数
+ */
+function existCleaningSchedule(calendarId: string,cleaningStartDates: Date,cleaningEndDates: Date){
+  
+  const myCalendar: Object = CalendarApp.getCalendarById(calendarId);
+  let events: Object = myCalendar.getEvents(cleaningStartDates,cleaningEndDates);
+  const eventNum: number = events.length;
+  const myRe = /】掃除$/;
+
+  //予定のタイトルに"】掃除"が含まれている予定を削除
+  for (let i = 0; i < eventNum; i++) {
+    if(myRe.exec(events[i].getTitle())){
+      events[i].deleteEvent();//予定の削除
+    }
+  }
+}
+
+/**
  * cleaningDutyBot
  * Chatworkから掃除当番を知らせるメッセージを送る関数
  * 
@@ -77,7 +124,7 @@ function cleaningDutyBot(){
   
   const token = PropertiesService.getScriptProperties().getProperty("Chatwork_API_Token");
   const roomId = PropertiesService.getScriptProperties().getProperty("Chatwork_room_id");
-  chatwork = new Chatwork(token,roomId);
+  let chatwork = new Chatwork(token,roomId);
 
   var userList = [];
   var title = '';
@@ -88,7 +135,7 @@ function cleaningDutyBot(){
     var event = events[i];
     //正規表現でイベントのタイトルに「】掃除」を含むか判定
     if(myRe.exec(event.getTitle())){
-      userNameArray = event.getTitle().split(/[【・】]/);
+      let userNameArray = event.getTitle().split(/[【・】]/);
       //userNameArrayのlength回数分だけuserListにpushする
       for(var s = 1; s < userNameArray.length-1; s++){
         userList.push(userNameArray[s]);

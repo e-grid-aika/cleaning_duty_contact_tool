@@ -1,8 +1,12 @@
 /**
  * Chatworkへのメッセージ送信処理を行うクラス
  */
-class Chatwork{
-  constructor(token, roomId){
+export class Chatwork{
+  token: string;
+  roomId: string;
+  client: object;
+
+  constructor(token: string, roomId: string){
     
     this.token = token /* ChatWork APIトークン*/
     this.roomId = roomId;  /* ChatWork ルームID*/
@@ -12,15 +16,14 @@ class Chatwork{
   /**
    * 指定したChatworkのルームIDにメッセージを送信する処理
    */
-  sendMessage(message){
+  sendMessage(message: string): void{
     try {
       this.client.sendMessage({
         room_id: this.roomId,
         body: message,
       });
     }catch (err) {
-      console.log('Failed with error %s',err.message);
-      sendMailWithOption(err.message,this.sendMessage.name);
+      console.error(`Failed with error ${err.message}`);
     }
   }
 }
