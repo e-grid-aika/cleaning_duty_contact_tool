@@ -49,3 +49,9 @@ https://typescriptbook.jp/tutorials/jest
 
 # スクリプトの実行
 ```npm run ○○○```でpackge.jsonのscriptsに登録してあるスクリプトを実行する
+
+
+
+# エラーの発生
+- 実行済みのトリガーがApps Scriptのトリガーページに残ったままになり、管理者のアカウントにトリガーが多すぎるとの警告メールが何度もくる
+  - 対策：終了したトリガーを手作業で削除する
