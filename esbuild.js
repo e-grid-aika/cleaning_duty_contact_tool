@@ -7,6 +7,7 @@ esbuild
     bundle: true,
     outfile: "./dist/main.js",
     plugins: [GasPlugin],
+    charset: 'utf8',
   })
   .catch((e) => {
     console.error(e);
