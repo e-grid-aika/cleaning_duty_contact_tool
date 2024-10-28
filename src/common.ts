@@ -30,7 +30,11 @@ export function sendMailWithOption(message: string,errFunction: string) {
 const adminEmail = PropertiesService.getScriptProperties().getProperty("AdminMailAddress");  //差出人のメールアドレス
 const subject = '~~掃除当番ツールエラー報告~~';            // メールの件名
 let userEmail = PropertiesService.getScriptProperties().getProperty("AdminMailAddress");   //送信先のメールアドレス
-  
+
+if(userEmail == null || adminEmail == null){
+  throw new Error("管理者のメールアドレスが設定されていません");
+}
+
 const options = { from: adminEmail, name: '掃除当番管理者'};
   
 //メール本文
