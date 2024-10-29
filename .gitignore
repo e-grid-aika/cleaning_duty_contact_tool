@@ -5,3 +5,5 @@ coverage/**
 appsscript.json
 .env
 dist/*.js
+dist/*.html
+dist/modules/
