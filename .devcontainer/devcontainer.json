@@ -1,0 +1,26 @@
+// See https://containers.dev/implementors/json_reference/ for configuration reference
+{
+  "name": "Node.js",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  "settings": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "MS-CEINTL.vscode-language-pack-ja",
+        "esbenp.prettier-vscode",
+        "oderwat.indent-rainbow",
+        "george-alisson.html-preview-vscode",
+        "mhutchie.git-graph",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.js-debug-companion"
+      ]
+    }
+  }
+}
