@@ -19,7 +19,9 @@
         "george-alisson.html-preview-vscode",
         "mhutchie.git-graph",
         "dbaeumer.vscode-eslint",
-        "ms-vscode.js-debug-companion"
+        "ms-vscode.js-debug-companion",
+        "Gruntfuggly.todo-tree",
+        "wayou.vscode-todo-highlight"
       ]
     }
   }
