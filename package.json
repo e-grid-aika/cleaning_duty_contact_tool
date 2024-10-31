@@ -8,7 +8,9 @@
     "bundle": "rollup --no-treeshake -c rollup.config.mjs",
     "build": "node esbuild.js",
     "push": "clasp push",
+    "pull": "clasp pull",
     "open": "clasp open",
+    "login": "clasp login",
     "deploy": "npm run build && npm run push",
     "license": "license-check-and-add add -f license-config.json",
     "test": "jest test/ --passWithNoTests --detectOpenHandles",
@@ -17,13 +19,23 @@
   "type": "module",
   "devDependencies": {
     "@google/clasp": "^2.4.2",
-    "@types/google-apps-script": "^1.0.83",
+    "@types/google-apps-script": "^1.0.84",
     "@types/jest": "^29.5.12",
     "clasp": "^1.0.0",
     "esbuild": "^0.23.1",
     "esbuild-gas-plugin": "^0.8.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.4",
-    "typescript": "^5.5.4"
-  }
+    "typescript": "^5.6.3"
+  },
+  "name": "cleaning_duty_contact_tool",
+  "version": "1.0.0",
+  "description": "- devcontainerで作成する場合はnpm install時にsudoを付ける",
+  "main": "main.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
